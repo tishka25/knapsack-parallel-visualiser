@@ -1,0 +1,14 @@
+
+.conatiner {
+  width: 25%;
+  background-color: darkseagreen;
+  margin: auto;
+  width: 50%;
+  border: 3px solid green;
+  padding: 10px;
+  margin-top: 200px;
+}
+
+.btn-warning{
+margin-top: 20px;
+}

@@ -147,19 +147,16 @@ func Handle() http.HandlerFunc {
 
 func registerRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/", index)
+	mux.HandleFunc("/calculate", calculate)
 	//mux.HandleFunc("/css", staticHandler)
 }
-func index(w http.ResponseWriter, r *http.Request) {
 
-	tmpl, err := template.ParseFiles("templates/index.html")
-	if err != nil {
-		fmt.Print(err)
-	}
+func calculate(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		err1 := r.ParseForm()
 		if err1 != nil {
-			fmt.Print(err)
+			fmt.Print(err1)
 		}
 		fmt.Print(r.Form)
 
@@ -208,7 +205,15 @@ func index(w http.ResponseWriter, r *http.Request) {
 		// knapSack.Items = items
 
 		log.Println("result is:", result)
+		w.Write([]byte(strconv.Itoa(result)))
+	}
+}
 
+func index(w http.ResponseWriter, r *http.Request) {
+
+	tmpl, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		fmt.Print(err)
 	}
 	err = tmpl.Execute(w, knapSack)
 	if err != nil {
@@ -219,8 +224,8 @@ func index(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	var mux = http.NewServeMux()
-	fs := http.FileServer(http.Dir("css"))
-	mux.Handle("/css/", http.StripPrefix("/css", fs))
+	fs := http.FileServer(http.Dir("resources"))
+	mux.Handle("/resources/", http.StripPrefix("/resources", fs))
 	registerRoutes(mux)
 	httpServer := http.Server{
 		Addr:    ":3000",

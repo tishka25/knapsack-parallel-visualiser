@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/resources/table.css">
+    <title>Tables</title>
+</head>
+<body>
+    <form action="/tables"></form>
+    <table class="items">
+        <thead>
+            <tr>
+                <th>Name</th> 
+                <th>Weight</th>
+                <th>Value</th>
+                 
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Items}}
+            <tr>
+                <td>{{ .Name }}</td>
+                <td>{{ .Value }}</td>
+                <td>{{ .Weight }}</td>
+            </tr>
+        {{ end}}
+        
+    </table>
+
+    <table class="algorithm">
+        <thead>
+            <tr>
+                <th>Algorithm</th> 
+            </tr>
+        </thead>
+        <tbody>
+            
+        {{ $a := .Kparallel }}
+        {{ range $a }}
+        <tr>
+        {{ $elem := . }}
+        {{ range $elem }}
+        <td> {{ printf "%d" . }}</td>
+        {{ end}}
+        </tr>
+        {{end}}
+    </table>
+   
+</body>
+</html>

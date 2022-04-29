@@ -4,23 +4,28 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 type Item struct {
-	Value  int `json:"value"`
-	Weight int `json:"weight"`
+	Name   string `json:"name"`
+	Value  int    `json:"value"`
+	Weight int    `json:"weight"`
 }
 type Knapsack struct {
-	Weight int    `json:"weight"`
-	Items  []Item `json:"items"`
+	Capacity int    `json:"capacity"`
+	Profit   int    `json:"profit"`
+	Items    []Item `json:"items"`
+}
+type Items struct {
+	Items     []Item
+	Kparallel [][]int
 }
 
+var items Items
 var knapSack Knapsack
 var tmpl *template.Template
 
@@ -30,47 +35,37 @@ func max(a, b int) int {
 	} else {
 		return b
 	}
-
 }
 
-func knapSackParallel(W int, weight []int, value []int, n int) int {
-
-	var Kparallel [4][51]int
-
-	//Kparallel := make([][]int, n+1, W+1)
-
+func knapSackParallel(W int, weight []int, value []int, n int) (int, []Item) {
 	var wg sync.WaitGroup
-	//var m sync.Mutex
-	//var Kparallel [10][51]int
 
-	//wg.Add(n + 1)
+	items.Kparallel = make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		items.Kparallel[i] = make([]int, W+1)
+	}
 
 	for i := 0; i <= n; i++ {
 		wg.Add(1)
 		go func(i int) {
 			for w := 0; w <= W; w++ {
-
 				if i == 0 || w == 0 {
-
-					Kparallel[i][w] = 0
-
+					items.Kparallel[i][w] = 0
 				} else if weight[i-1] <= w {
-
-					Kparallel[i][w] = max(value[i-1]+Kparallel[i-1][w-weight[i-1]], Kparallel[i-1][w])
-
+					items.Kparallel[i][w] = max(value[i-1]+items.Kparallel[i-1][w-weight[i-1]], items.Kparallel[i-1][w])
 				} else {
-
-					Kparallel[i][w] = Kparallel[i-1][w]
-
+					items.Kparallel[i][w] = items.Kparallel[i-1][w]
 				}
-
 			}
 			wg.Done()
 		}(i)
 		wg.Wait()
 
 	}
-	return Kparallel[n][W]
+	result := items.Kparallel[n][W]
+	addeditems := fetcAddedItems(result, n, W, value, weight)
+
+	return result, addeditems
 
 }
 func knapSackClassic(W int, weight []int, value []int, n int) int {
@@ -94,59 +89,46 @@ func knapSackClassic(W int, weight []int, value []int, n int) int {
 	return K[n][W]
 
 }
-func Demo() {
-	coutnOfElement := 100
-	W := 20
 
-	value := make([]int, coutnOfElement)
-	weight := make([]int, coutnOfElement)
+func setItemsSlice(values []int, weights []int) []Item {
+	var items []Item
+	for i := 0; i < len(values); i++ {
 
-	rand.Seed(time.Now().UnixMilli())
-	for i := range value {
-		value[i] = rand.Intn(100)
-		weight[i] = rand.Intn(100)
+		item := Item{Name: string(rune(i + 65)), Value: values[i], Weight: weights[i]}
+		items = append(items, item)
 	}
 
-	timeBefore := time.Now()
-	log.Println("paraller result", knapSackParallel(W, weight, value, coutnOfElement))
-	timeAfter := time.Now()
-	result := timeAfter.UnixMilli() - timeBefore.UnixMilli()
-	log.Println("Time after parallel ", result)
+	return items
+}
+func fetcAddedItems(result int, n int, w int, value []int, weight []int) []Item {
+	var addedItemsWeights = make([]int, 0)
+	var addedItems = make([]Item, 0)
 
-	timeBeforeC := time.Now()
-	log.Println("non parallel result", knapSackClassic(W, weight, value, coutnOfElement))
-	timeAfterC := time.Now()
-	result1 := timeAfterC.UnixMilli() - timeBeforeC.UnixMilli()
-	log.Println("Time after classic", result1)
+	for i := n; i > 0 && result > 0; i-- {
+		if result != items.Kparallel[i-1][w] {
+			addedItemsWeights = append(addedItemsWeights, weight[i-1])
+			result = result - value[i-1]
+			w = w - weight[i-1]
+		}
+	}
 
+	for _, w := range addedItemsWeights {
+		for _, item := range items.Items {
+			if item.Weight == w {
+				addedItems = append(addedItems, item)
+			}
+		}
+	}
+
+	return addedItems
 }
 
 func init() {
-	tmpl = template.Must(template.ParseGlob("templates/index.html"))
-}
-func Handle() http.HandlerFunc {
-
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		coutnOfElement := 100
-		//W := 20
-
-		value := make([]int, coutnOfElement)
-		weight := make([]int, coutnOfElement)
-		rand.Seed(time.Now().UnixMilli())
-		for i := range value {
-			value[i] = rand.Intn(100)
-			weight[i] = rand.Intn(100)
-		}
-		//result := knapSackClassic(W, weight, value, coutnOfElement)
-
-		tmpl.ExecuteTemplate(w, "index.html", nil)
-
-	}
+	tmpl = template.Must(template.ParseGlob("templates/*.html"))
 }
 
 func registerRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/", index)
+	mux.HandleFunc("/", HandlerInputForm)
 	mux.HandleFunc("/calculate", calculate)
 	//mux.HandleFunc("/css", staticHandler)
 }
@@ -154,20 +136,18 @@ func registerRoutes(mux *http.ServeMux) {
 func calculate(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
-		err1 := r.ParseForm()
-		if err1 != nil {
-			fmt.Print(err1)
+		err := r.ParseForm()
+		if err != nil {
+			fmt.Print(err)
 		}
-		fmt.Print(r.Form)
-
 		values := strings.Split(r.FormValue("values"), " ")
 		weights := strings.Split(r.FormValue("weights"), " ")
-		maxCapacity, err := strconv.Atoi(r.FormValue("weight"))
+		knapSack.Capacity, err = strconv.Atoi(r.FormValue("weight"))
 		if err != nil {
 			fmt.Print(err)
 		}
 
-		log.Print(values, weights, maxCapacity)
+		log.Print(values, weights, knapSack.Capacity)
 
 		valuesSlice := make([]int, 0, len(values))
 		weightsSlice := make([]int, 0, len(values))
@@ -177,39 +157,29 @@ func calculate(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Print(err)
 			}
-			valuesSlice = append(valuesSlice, currentValue)
 			currentWeight, err := strconv.Atoi(weights[i])
 			if err != nil {
 				fmt.Print(err)
 			}
+
+			valuesSlice = append(valuesSlice, currentValue)
 			weightsSlice = append(weightsSlice, currentWeight)
 		}
 
-		result := knapSackClassic(maxCapacity, weightsSlice, valuesSlice, len(valuesSlice))
+		items.Items = setItemsSlice(valuesSlice, weightsSlice)
+		log.Println("items:", items)
 
-		// knapSack.Weight, err = strconv.Atoi(maxCapacity)
-		// if err != nil {
-		// 	fmt.Print(err)
-		// }
+		knapSack.Profit, knapSack.Items = knapSackParallel(knapSack.Capacity, weightsSlice, valuesSlice, len(valuesSlice))
 
-		// items := make([]Item, 0)
-		// currentItem := Item{}
+		log.Println("profit is:", knapSack.Profit)
+		w.Write([]byte(strconv.Itoa(knapSack.Profit)))
 
-		// for i := range valuesSlice {
-		// 	currentItem.Value, err = strconv.Atoi(valuesSlice[i])
-		// 	currentItem.Weight, err = strconv.Atoi(weightsSlice[i])
+		log.Println("added items are:", knapSack.Items)
 
-		// 	items = append(items, currentItem)
-		// }
-
-		// knapSack.Items = items
-
-		log.Println("result is:", result)
-		w.Write([]byte(strconv.Itoa(result)))
 	}
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
+func HandlerInputForm(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
@@ -220,12 +190,25 @@ func index(w http.ResponseWriter, r *http.Request) {
 		fmt.Print(err)
 	}
 }
+func HandlerCreateTables(w http.ResponseWriter, r *http.Request) {
+
+	tmpl, err := template.ParseFiles("templates/table.html")
+	if err != nil {
+		fmt.Print(err)
+	}
+	err = tmpl.Execute(w, items)
+	if err != nil {
+		fmt.Print(err)
+	}
+}
 
 func main() {
 
 	var mux = http.NewServeMux()
+
 	fs := http.FileServer(http.Dir("resources"))
 	mux.Handle("/resources/", http.StripPrefix("/resources", fs))
+
 	registerRoutes(mux)
 	httpServer := http.Server{
 		Addr:    ":3000",

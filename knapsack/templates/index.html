@@ -8,9 +8,17 @@
     <link rel="stylesheet" type="text/css" href="resources/css.css">
     <script src="resources/script.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    
+    
+    <div class="text-center page-header">
+      <h1>Knapsack Calculator</h1>
+      <h3>Given a set of items, each with a weight and a value. <br> 
+        <strong>Knapsack algorithm</strong> 
+        determine the number of each item to include in a collection so that the total weight is less than or equal to a given limit and the total value is as large as possible. <br>
+         Whereas in <strong>Knapsack 0-1 algorithm</strong> items cannot be divided which means either should take the item as a whole or should leave it.</h3>
+    </div>
 
-
-<div class="conatiner">
+<div class="conatiner" id="container">
   <form id="inputForm" method="post" action="/calculate">
     <label>Weights</label>
     <input type="text"  name="weights" class="form-control" id="weight" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
@@ -18,14 +26,17 @@
     <label>Values</label>
     <input type="text" name="values" id="valueItems" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
 
-    <label>Max Value of the Knapsack</label>
+    <label>Capacity of the Knapsack</label>
     <input type="text" name="weight" id="knapsackWeight" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
 
     <button type="submit" class="btn btn-warning">Save Item</button>
     
   </form>
-
  </div> 
+
+ <div class="text-center answer">
+   <h4>The answer is:</h4> <h4>напиши отговора</h4>
+ </div>
   </body>
 </html>
 <!-- <script src="js.js">
@@ -42,5 +53,7 @@
     console.log(1)
   }
 </script> -->
+
+
 
 

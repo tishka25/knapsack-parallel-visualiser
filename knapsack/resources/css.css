@@ -1,14 +1,52 @@
 
 .conatiner {
   width: 25%;
-  background-color: darkseagreen;
+  background-color: #9999ff;
   margin: auto;
   width: 50%;
-  border: 3px solid green;
+  border: 3px solid #4d4dff;
   padding: 10px;
-  margin-top: 200px;
+  margin-top: 50px;
+  font-family: cursive;
 }
 
 .btn-warning{
+  margin-top: 20px;
+  font-family: cursive;
+
+}
+.page-header {
+  padding-bottom: 9px;
+  margin: 40px 0px 20px;
+}
+
+h3{
+  font-size: 20px !important;
+  font-family: cursive;
+  margin-right: 70px;
+  margin-left: 70px;
+  margin-top: 30px !important;
+}
+
+h4 {
+  display:inline;
+  margin: 0px;
+  font-size: 20px !important;
+  font-family: cursive;
+}
+
+.answer{
 margin-top: 20px;
 }
+
+
+h1{
+  font-family: cursive;
+  margin-top: 50px;
+  border-bottom: solid 2px #4d4dff;
+}
+
+label{
+  font-family: cursive;
+}
+

@@ -2,7 +2,7 @@ const onFormSubmit = (e) => {
     e.preventDefault()
     console.log(e)
 
-    const elements = e.target.querySelectorAll('.form-control')
+    // const elements = e.target.querySelectorAll('.form-control')
 
     // const data = new FormData()
 
@@ -23,15 +23,22 @@ const onFormSubmit = (e) => {
             return response.text()
         })
         .then(result => {
-            console.log(result)
+            const resultText = document.querySelector('.result');
+            resultText.innerHTML = result
+            // console.log(result)
         })
 
     // stop reloading page
     return false
 }
 
+const onClearForm = () => {
+    // reset input
+    document.getElementById("inputForm").reset();
+}
 
 window.onload = () => {
     const form = document.getElementById("inputForm")
     form.addEventListener('submit', onFormSubmit)
+    document.getElementById("clearButton").addEventListener("click", onClearForm);
 }

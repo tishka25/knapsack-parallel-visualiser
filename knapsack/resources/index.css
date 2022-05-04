@@ -9,6 +9,10 @@
   margin-top: 50px;
   font-family: cursive;
 }
+.buttonWrapper {
+  display: flex;
+    justify-content: space-between;
+}
 
 .btn-warning{
   margin-top: 20px;

@@ -23,6 +23,7 @@ type Knapsack struct {
 type Items struct {
 	Items     []Item
 	Kparallel [][]int
+	Profit    int
 }
 
 var items Items
@@ -64,7 +65,7 @@ func knapSackParallel(W int, weight []int, value []int, n int) (int, []Item) {
 	}
 	result := items.Kparallel[n][W]
 	addeditems := fetcAddedItems(result, n, W, value, weight)
-
+	items.Profit = result
 	return result, addeditems
 
 }
@@ -172,7 +173,8 @@ func calculate(w http.ResponseWriter, r *http.Request) {
 		knapSack.Profit, knapSack.Items = knapSackParallel(knapSack.Capacity, weightsSlice, valuesSlice, len(valuesSlice))
 
 		log.Println("profit is:", knapSack.Profit)
-		w.Write([]byte(strconv.Itoa(knapSack.Profit)))
+		// w.Write([]byte(strconv.Itoa(knapSack.Profit)))
+		HandlerCreateTables(w, r)
 
 		log.Println("added items are:", knapSack.Items)
 
@@ -190,6 +192,7 @@ func HandlerInputForm(w http.ResponseWriter, r *http.Request) {
 		fmt.Print(err)
 	}
 }
+
 func HandlerCreateTables(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, err := template.ParseFiles("templates/table.html")

@@ -8,7 +8,9 @@
 </head>
 <body>
     <form action="/tables"></form>
-    <table class="items">
+    <div class="items">
+        <h2>Items</h2>
+    <table >
         <thead>
             <tr>
                 <th>Name</th> 
@@ -27,26 +29,43 @@
         {{ end}}
         
     </table>
-
-    <table class="algorithm">
-        <thead>
+    </div>
+    <div class="algorithm">
+        <h2>Algorithm</h2>
+        <table  >
+        
+            <tbody>
+                
+            {{ $a := .Kparallel }}
+            {{ range $a }}
             <tr>
-                <th>Algorithm</th> 
+            {{ $elem := . }}
+            {{ range $elem }}
+            <td> {{ printf "%d" . }}</td>
+            {{ end}}
             </tr>
-        </thead>
-        <tbody>
+            {{end}}
+        </table>
+        
+
+    </div>
+    <div class="profit">
+        <h2>The profit is {{ .Profit }}</h2>
+        
+            <ul>
+                {{ range .AddedItems}}
+                <li>Item: {{ .Name }}, weight: {{ .Weight }}, value: {{ .Value }} </li>
             
-        {{ $a := .Kparallel }}
-        {{ range $a }}
-        <tr>
-        {{ $elem := . }}
-        {{ range $elem }}
-        <td> {{ printf "%d" . }}</td>
-        {{ end}}
-        </tr>
-        {{end}}
-    </table>
-    <h2>The result is {{ .Profit }}</h2>
+                {{ end}}
+
+
+            </ul>
+               
+    </div>
+   
+    
+
+    
    
 </body>
 </html>

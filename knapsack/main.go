@@ -21,9 +21,10 @@ type Knapsack struct {
 	Items    []Item `json:"items"`
 }
 type Items struct {
-	Items     []Item
-	Kparallel [][]int
-	Profit    int
+	Items      []Item
+	Kparallel  [][]int
+	Profit     int
+	AddedItems []Item
 }
 
 var items Items
@@ -170,13 +171,13 @@ func calculate(w http.ResponseWriter, r *http.Request) {
 		items.Items = setItemsSlice(valuesSlice, weightsSlice)
 		log.Println("items:", items)
 
-		knapSack.Profit, knapSack.Items = knapSackParallel(knapSack.Capacity, weightsSlice, valuesSlice, len(valuesSlice))
+		items.Profit, items.AddedItems = knapSackParallel(knapSack.Capacity, weightsSlice, valuesSlice, len(valuesSlice))
 
 		log.Println("profit is:", knapSack.Profit)
 		// w.Write([]byte(strconv.Itoa(knapSack.Profit)))
 		HandlerCreateTables(w, r)
 
-		log.Println("added items are:", knapSack.Items)
+		log.Println("added items are:", items.AddedItems)
 
 	}
 }

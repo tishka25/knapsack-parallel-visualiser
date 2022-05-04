@@ -1,13 +1,25 @@
-
+.homepage{
+  max-width: 100vw;
+  border: #1b1a1a;
+  background-color: #ffffff;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin: 50px;
+  margin-bottom: 50px;
+  box-shadow: 0px 0px 20px 0px #b7b7ca;
+  border-radius: 4px;
+  
+}
 .conatiner {
   width: 25%;
-  background-color: #9999ff;
+  background-color: #bdbdfe;
   margin: auto;
   width: 50%;
-  border: 3px solid #4d4dff;
+  border: 3px solid #7777ff;
   padding: 10px;
   margin-top: 50px;
   font-family: cursive;
+  margin-bottom: 50px;
 }
 .buttonWrapper {
   display: flex;
@@ -46,6 +58,7 @@ margin-top: 20px;
 
 h1{
   font-family: cursive;
+  padding-bottom: 20px;
   margin-top: 50px;
   border-bottom: solid 2px #4d4dff;
 }
